@@ -38,4 +38,6 @@ public class TechStack {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+
 }

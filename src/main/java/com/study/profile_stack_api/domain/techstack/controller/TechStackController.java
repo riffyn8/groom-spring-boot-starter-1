@@ -3,6 +3,8 @@ package com.study.profile_stack_api.domain.techstack.controller;
 import com.study.profile_stack_api.domain.techstack.dto.TechStackRequest;
 import com.study.profile_stack_api.domain.techstack.dto.TechStackResponse;
 import com.study.profile_stack_api.domain.techstack.service.TechStackService;
+import com.study.profile_stack_api.global.common.PageRequest;
+import com.study.profile_stack_api.global.common.PageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,13 @@ public class TechStackController {
                 .status(HttpStatus.CREATED)
                 .body(res);
     }
+
+    @GetMapping
+    public PageResponse<TechStackResponse> findAllWithPaging(PageRequest request, @PathVariable Long profileId) {
+
+        return techStackService.findAllWithPaging(request.getPage(), request.getSize(), profileId);
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<TechStackResponse> getTechStack(@PathVariable Long profileId, @PathVariable Long id) {

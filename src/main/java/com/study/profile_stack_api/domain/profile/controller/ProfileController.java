@@ -3,6 +3,9 @@ package com.study.profile_stack_api.domain.profile.controller;
 import com.study.profile_stack_api.domain.profile.dto.ProfileRequest;
 import com.study.profile_stack_api.domain.profile.dto.ProfileResponse;
 import com.study.profile_stack_api.domain.profile.service.ProfileService;
+import com.study.profile_stack_api.global.common.PageRequest;
+import com.study.profile_stack_api.global.common.PageResponse;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +26,12 @@ public class ProfileController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(res);
+    }
+
+    @GetMapping
+    public PageResponse<ProfileResponse> findAllWithPaging(PageRequest request) {
+
+        return profileService.findAllWithPaging(request.getPage(), request.getSize());
     }
 
     @GetMapping("/{id}")

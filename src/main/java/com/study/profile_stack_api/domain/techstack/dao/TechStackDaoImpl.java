@@ -1,6 +1,7 @@
 package com.study.profile_stack_api.domain.techstack.dao;
 
 import com.study.profile_stack_api.domain.techstack.entity.TechStack;
+import com.study.profile_stack_api.global.common.PageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -42,6 +44,25 @@ public class TechStackDaoImpl implements TechStackDao{
             techStack.setId(generatedId.longValue());
 
         return techStack;
+    }
+
+    @Override
+    public PageResponse<TechStack> findAllWithPaging(int page, int size, Long profileId) {
+        String countSql = """
+                SELECT COUNT(*) FROM tech_stack WHERE profile_id = ?
+                """;
+        Long totalElements = jdbcTemplate.queryForObject(countSql, Long.class, profileId);
+
+        if(totalElements == null || totalElements == 0)
+            return new PageResponse<>(List.of(), page, size, 0);
+
+        String dataSql = """
+                SELECT * FROM tech_stack WHERE profile_id = ? LIMIT ? OFFSET ?
+                """;
+        int offset = page * size;
+        List<TechStack> content = jdbcTemplate.query(dataSql, techStackRowMapper, profileId, size, offset);
+
+        return new PageResponse<>(content, page, size, totalElements);
     }
 
     @Override

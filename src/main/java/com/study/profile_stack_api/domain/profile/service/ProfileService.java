@@ -4,8 +4,10 @@ import com.study.profile_stack_api.domain.profile.dao.ProfileDao;
 import com.study.profile_stack_api.domain.profile.dto.ProfileRequest;
 import com.study.profile_stack_api.domain.profile.dto.ProfileResponse;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
+import com.study.profile_stack_api.global.common.PageResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +31,21 @@ public class ProfileService {
         Profile savedProfile = profileDao.saveProduct(profile);
 
         return ProfileResponse.from(savedProfile);
+    }
+
+    public PageResponse<ProfileResponse> findAllWithPaging(int page, int size) {
+        Page<Profile> profilePage = profileDao.findAllWithPaging(page, size);
+
+        List<ProfileResponse> profileResponseList = profilePage.getContent().stream()
+                .map(ProfileResponse::from)
+                .toList();
+
+        return new PageResponse<>(
+                profileResponseList,
+                profilePage.getNumber(),
+                profilePage.getSize(),
+                profilePage.getTotalElements()
+        );
     }
 
     public ProfileResponse getProfile(Long id) {

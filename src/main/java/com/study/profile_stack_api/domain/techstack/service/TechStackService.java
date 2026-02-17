@@ -1,12 +1,14 @@
 package com.study.profile_stack_api.domain.techstack.service;
 
-import com.study.profile_stack_api.domain.profile.entity.Profile;
 import com.study.profile_stack_api.domain.techstack.dao.TechStackDao;
 import com.study.profile_stack_api.domain.techstack.dto.TechStackRequest;
 import com.study.profile_stack_api.domain.techstack.dto.TechStackResponse;
 import com.study.profile_stack_api.domain.techstack.entity.TechStack;
+import com.study.profile_stack_api.global.common.PageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +27,21 @@ public class TechStackService {
         TechStack savedTechStack = techStackDao.saveTechStack(techStack);
 
         return TechStackResponse.from(savedTechStack);
+    }
+
+    public PageResponse<TechStackResponse> findAllWithPaging(int page, int size, Long profileId) {
+        PageResponse<TechStack> techStackPage = techStackDao.findAllWithPaging(page, size, profileId);
+
+        List<TechStackResponse> profileResponseList = techStackPage.getContent().stream()
+                .map(TechStackResponse::from)
+                .toList();
+
+        return new PageResponse<>(
+                profileResponseList,
+                techStackPage.getPage(),
+                techStackPage.getSize(),
+                techStackPage.getTotalElements()
+        );
     }
 
     public TechStackResponse getTechStack(Long profileId, Long id) {
