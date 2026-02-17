@@ -1,0 +1,97 @@
+package com.study.profile_stack_api.domain.techstack.dao;
+
+import com.study.profile_stack_api.domain.techstack.entity.TechStack;
+import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
+
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.util.Optional;
+
+@Repository
+@RequiredArgsConstructor
+public class TechStackDaoImpl implements TechStackDao{
+    private final JdbcTemplate jdbcTemplate;
+
+    @Override
+    public TechStack saveTechStack(TechStack techStack) {
+        String sql = """
+                INSERT INTO tech_stack(profile_id, name, category, proficiency, years_of_exp) VALUES(?,?,?,?,?)
+                """;
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(conn -> {
+            PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setLong(1, techStack.getProfileId());
+            ps.setString(2, techStack.getName());
+            ps.setString(3, techStack.getCategory());
+            ps.setString(4, techStack.getProficiency());
+            ps.setInt(5, techStack.getYearsOfExp());
+            return ps;
+
+        }, keyHolder);
+
+        Number generatedId = (Number) keyHolder.getKeys().get("ID");
+
+        if(generatedId != null)
+            techStack.setId(generatedId.longValue());
+
+        return techStack;
+    }
+
+    @Override
+    public Optional<TechStack> findById(Long profileId, Long id) {
+        String sql = "SELECT * FROM tech_stack WHERE profile_id = ? AND id = ?";
+
+        try{
+            TechStack techStack = jdbcTemplate.queryForObject(sql, techStackRowMapper, profileId, id);
+            return Optional.ofNullable(techStack);
+        }catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public TechStack updateTechStack(Long profileId, Long id, TechStack techStack) {
+        String sql = """
+                UPDATE tech_stack SET name = ?, category = ?, proficiency = ?, years_of_exp = ? WHERE id = ? AND profile_id = ?
+                """;
+
+        int updated = jdbcTemplate.update(sql,
+                techStack.getName(),
+                techStack.getCategory(),
+                techStack.getProficiency(),
+                techStack.getYearsOfExp(),
+                id,
+                profileId
+                );
+        if(updated == 0)
+            throw new RuntimeException("기술 스택 ID를 찾을 수 없습니다." + techStack.getId());
+
+        return techStack;
+    }
+
+    @Override
+    public void deleteTechStack(Long profileId, Long id) {
+        String sql = "DELETE FROM tech_stack WHERE id = ? AND profile_id = ?";
+        int deleted = jdbcTemplate.update(sql, id, profileId);
+    }
+
+    private final RowMapper<TechStack> techStackRowMapper = (rs, rowNum) -> {
+        TechStack techStack = TechStack.builder()
+                .id(rs.getLong("id"))
+                .profileId(rs.getLong("profile_id"))
+                .name(rs.getString("name"))
+                .category(rs.getString("category"))
+                .proficiency(rs.getString("proficiency"))
+                .yearsOfExp(rs.getInt("years_of_exp"))
+                .build();
+
+        return techStack;
+    };
+}
