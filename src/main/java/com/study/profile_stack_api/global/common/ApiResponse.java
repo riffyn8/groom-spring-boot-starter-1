@@ -19,10 +19,10 @@ public class ApiResponse<T> {
         return res;
     }
 
-    public static <T> ApiResponse<T> error(String code, String errMessage, String resMessage) {
+    public static <T> ApiResponse<T> error(String code, String errMessage) {
         ApiResponse<T> res = new ApiResponse<>();
         res.success = false;
-        res.resMessage = resMessage;
+        res.resMessage = null;
         res.data = null;
         res.error = new ErrorInfo(code, errMessage);
         return res;

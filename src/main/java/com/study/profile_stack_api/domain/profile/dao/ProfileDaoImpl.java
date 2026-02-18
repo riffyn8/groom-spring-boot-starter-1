@@ -2,7 +2,6 @@ package com.study.profile_stack_api.domain.profile.dao;
 
 import com.study.profile_stack_api.domain.profile.entity.Profile;
 import com.study.profile_stack_api.domain.profile.repository.ProfileRepository;
-import com.study.profile_stack_api.global.common.PageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -33,9 +32,8 @@ public class ProfileDaoImpl implements ProfileDao{
     }
 
     @Override
-    public Profile findById(Long id) {
-        Profile profile = profileRepository.findById(id).orElse(null);
-        return profile;
+    public Optional<Profile> findById(Long id) {
+        return profileRepository.findById(id);
     }
 
     @Override
@@ -47,5 +45,15 @@ public class ProfileDaoImpl implements ProfileDao{
     @Override
     public void deleteProfile(Long id) {
         profileRepository.deleteById(id);
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return profileRepository.existsByEmail(email);
+    }
+
+    @Override
+    public boolean existsById(Long id) {
+        return profileRepository.existsById(id);
     }
 }

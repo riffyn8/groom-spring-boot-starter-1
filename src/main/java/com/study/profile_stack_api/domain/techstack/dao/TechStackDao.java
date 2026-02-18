@@ -21,4 +21,5 @@ public interface TechStackDao {
     // 기술 스택 삭제
     void deleteTechStack(Long profileId, Long id);
 
+    public boolean existsById(Long id);
 }

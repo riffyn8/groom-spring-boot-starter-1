@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ProfileRepository extends JpaRepository<Profile, Long> {
     List<Profile> findByPosition(String position);
+
+    boolean existsByEmail(String email);
 }

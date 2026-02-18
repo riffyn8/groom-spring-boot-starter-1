@@ -2,6 +2,7 @@ package com.study.profile_stack_api.domain.techstack.dao;
 
 import com.study.profile_stack_api.domain.techstack.entity.TechStack;
 import com.study.profile_stack_api.global.common.PageResponse;
+import com.study.profile_stack_api.global.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -92,7 +93,7 @@ public class TechStackDaoImpl implements TechStackDao{
                 profileId
                 );
         if(updated == 0)
-            throw new RuntimeException("기술 스택 ID를 찾을 수 없습니다." + techStack.getId());
+            throw new DataNotFoundException("기술 스택", id);
 
         return techStack;
     }
@@ -101,6 +102,10 @@ public class TechStackDaoImpl implements TechStackDao{
     public void deleteTechStack(Long profileId, Long id) {
         String sql = "DELETE FROM tech_stack WHERE id = ? AND profile_id = ?";
         int deleted = jdbcTemplate.update(sql, id, profileId);
+
+        if (deleted == 0) {
+            throw new DataNotFoundException("기술 스택", id);
+        }
     }
 
     private final RowMapper<TechStack> techStackRowMapper = (rs, rowNum) -> {
@@ -115,4 +120,16 @@ public class TechStackDaoImpl implements TechStackDao{
 
         return techStack;
     };
+
+    @Override
+    public boolean existsById(Long id) {
+        String sql = "SELECT EXISTS (SELECT 1 FROM tech_stack WHERE id = ?) ";
+
+        try {
+            Integer result = jdbcTemplate.queryForObject(sql, Integer.class, id);
+            return result != null && result == 1;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

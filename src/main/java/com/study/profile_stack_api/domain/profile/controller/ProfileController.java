@@ -50,9 +50,13 @@ public class ProfileController {
     public ResponseEntity<ApiResponse<List<ProfileResponse>>> findByPosition(@PathVariable String position) {
         List<ProfileResponse> res = profileService.findByPosition(position);
 
+        String resMessage = position + " 조회에 성공했습니다.";
+        if(res == null || res.isEmpty())
+            resMessage = position + "에 해당하는 데이터가 없습니다.";
+
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ApiResponse.success(res, position + " 조회에 성공했습니다."));
+                .body(ApiResponse.success(res, resMessage));
     }
 
 

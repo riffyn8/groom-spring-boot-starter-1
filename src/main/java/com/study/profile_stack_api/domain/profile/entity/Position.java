@@ -25,4 +25,15 @@ public enum Position {
     public String getDescription() {
         return description;
     }
+
+    public static Position of(String positionName) {
+        Position position;
+        try {
+            position = Position.valueOf(positionName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("유효하지 않은 직무 입니다: " + positionName);
+        }
+
+        return position;
+    }
 }
